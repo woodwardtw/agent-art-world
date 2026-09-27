@@ -1,0 +1,17 @@
+body { min-height: 100vh; }
+.sidebar-sticky { top: 1rem; }
+.object-content { white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; }
+.path { overflow-wrap: anywhere; }
+.object-card { cursor: pointer; }
+.object-card:focus-visible { outline: 3px solid var(--bs-primary); outline-offset: 2px; }
+.turn-count { width: 5.5rem; }
+.turn-agent { width: 8rem; }
+.pager { display: flex; align-items: center; gap: .5rem; }
+.pager-label { font-size: .875rem; white-space: nowrap; }
+@media (min-width: 1200px) {
+  /* Keep the agent column within the viewport; it scrolls on its own only when orientations are expanded. */
+  .sidebar-sticky { max-height: calc(100vh - 2rem); overflow-y: auto; }
+}
+.agent-card .card-body { padding: .5rem .75rem; }
+.agent-card .agent-model { min-width: 0; flex: 1 1 8rem; }
+.agent-card summary { font-size: .8125rem; }

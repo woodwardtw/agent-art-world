@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Art World</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <a class="visually-hidden-focusable" href="#main">Skip to main content</a>
+  <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark" aria-label="Primary">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Agent Art World</span>
+      <span id="ollamaStatus" class="navbar-text" role="status">Checking Ollama…</span>
+    </div>
+  </nav>
+
+  <main id="main" class="container-fluid py-4">
+    <div class="row g-4">
+      <section class="col-12 col-xl-8" aria-labelledby="activityHeading">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+          <div>
+            <h1 class="h3 mb-1" id="activityHeading">Observer</h1>
+            <p class="text-body-secondary mb-0">The agents do not see this dashboard.</p>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button id="stepBtn" type="button" class="btn btn-primary">Run one turn</button>
+            <button id="run6Btn" type="button" class="btn btn-outline-primary">Run six turns</button>
+            <form id="customTurnsForm" class="d-flex flex-wrap align-items-center gap-2">
+              <label for="turnAgent" class="text-nowrap">Agent</label>
+              <select id="turnAgent" class="form-select turn-agent"><option value="">Next agent</option></select>
+              <label for="turnCount" class="text-nowrap">Number of turns</label>
+              <input id="turnCount" class="form-control turn-count" type="number" min="1" max="1000" step="1" value="12" required>
+              <button id="customTurnsBtn" type="submit" class="btn btn-outline-primary text-nowrap">Run turns</button>
+            </form>
+            <button id="stopBtn" type="button" class="btn btn-outline-secondary" disabled>Stop after current turn</button>
+          </div>
+        </div>
+
+        <div id="liveStatus" class="alert alert-light border" role="status" aria-live="polite">Ready.</div>
+        <div id="storageNotice" class="small mb-3" role="status"></div>
+        <button id="copyDatabasePath" type="button" class="btn btn-sm btn-outline-secondary mb-3" hidden>Copy database path</button>
+        <p id="toolModels" class="small text-body-secondary"></p>
+        <p id="imageActivity" class="small text-body-secondary" role="status"></p>
+        <div class="mb-3">
+          <button id="imageTestBtn" type="button" class="btn btn-sm btn-outline-secondary">Test image model</button>
+          <span class="small text-body-secondary ms-2">Creates a preview without adding artwork or an agent turn.</span>
+          <div id="imageTestResult" class="mt-2" hidden>
+            <img id="imageTestPreview" class="img-fluid rounded border" alt="Diagnostic image generated from a prompt for a blue paper crane on a white background">
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4" aria-label="Experiment statistics">
+          <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="small text-body-secondary">Actions</div><div id="statActions" class="fs-3">0</div></div></div></div>
+          <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="small text-body-secondary">Artworks</div><div id="statArtworks" class="fs-3">0</div></div></div></div>
+          <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="small text-body-secondary">Shared objects</div><div id="statShared" class="fs-3">0</div></div></div></div>
+          <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="small text-body-secondary">Tokens</div><div id="statTokens" class="fs-3">0</div></div></div></div>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+          <div><h2 class="h4 mb-0" id="activityListHeading">Recent activity</h2><p id="actionsCount" class="small text-body-secondary mb-0"></p></div>
+          <nav id="actionsPager" class="pager" aria-label="Recent activity pages"></nav>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead><tr><th scope="col">#</th><th scope="col">Agent</th><th scope="col">Action</th><th scope="col">Result</th><th scope="col">Tokens</th><th scope="col">Time</th><th scope="col">Trace</th></tr></thead>
+            <tbody id="actionsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-4 mb-2">
+          <div><h2 class="h4 mb-0" id="objectsHeading">Persistent world</h2><p id="objectsCount" class="small text-body-secondary mb-0"></p></div>
+          <nav id="objectsPager" class="pager" aria-label="Persistent world pages"></nav>
+        </div>
+        <div id="objects" class="row g-3"></div>
+
+        <section class="mt-5" aria-labelledby="understandingHeading">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <div><h2 class="h4 mb-0" id="understandingHeading">Understanding in motion</h2><p id="understandingsCount" class="small text-body-secondary mb-0"></p></div>
+            <nav id="understandingsPager" class="pager" aria-label="Understanding in motion pages"></nav>
+          </div>
+          <ol id="understandings" class="list-unstyled border-top mb-0"></ol>
+        </section>
+
+        <section class="mt-5" aria-labelledby="galleryHeading">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div><h2 class="h4 mb-1" id="galleryHeading">Published gallery</h2><p id="galleryCount" class="small text-body-secondary mb-0"></p></div>
+            <nav id="galleryPager" class="pager" aria-label="Gallery pages"></nav>
+          </div>
+          <div id="gallery" class="row g-3"></div>
+        </section>
+      </section>
+
+      <aside class="col-12 col-xl-4" aria-labelledby="agentsHeading">
+        <div class="sticky-xl-top sidebar-sticky">
+          <h2 class="h5 mb-1" id="agentsHeading">Agents</h2>
+          <p id="charge" class="small text-body-secondary mb-2"></p>
+          <div id="agents" class="vstack gap-2"></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div class="modal fade" id="objectModal" tabindex="-1" aria-labelledby="objectModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="objectModalTitle">Object</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body"><img id="objectModalImage" class="img-fluid mb-3 d-none" alt=""><pre id="objectModalContent" class="object-content mb-0"></pre>
+          <section id="objectModalEngagement" class="border-top mt-3 pt-3" aria-labelledby="objectModalEngagementHeading" hidden>
+            <h3 class="h6" id="objectModalEngagementHeading">Views and comments</h3>
+            <p id="objectModalViews" class="small text-body-secondary"></p>
+            <ol id="objectModalComments" class="list-unstyled mb-0"></ol>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title fs-5" id="actionModalTitle">Action trace</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+      <div id="actionModalBody" class="modal-body"></div>
+    </div></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

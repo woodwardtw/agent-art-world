@@ -1,0 +1,22 @@
+{
+  "name": "agent-art-world",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "A small experimental world for autonomous AI agents given the charge: Create art that matters.",
+  "scripts": {
+    "start": "node server.js",
+    "stop": "node scripts-stop.js",
+    "reset": "node scripts-reset.js",
+    "export": "node scripts-export.js",
+    "migrate": "node scripts-migrate.js",
+    "test": "node tests/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "express": "^5.1.0"
+  }
+}
